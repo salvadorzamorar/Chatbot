@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot Azure UNIDEG</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+        #chatbox {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            height: 500px;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+        .msg {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+        }
+        .user {
+            background: #d1e7ff;
+            text-align: right;
+        }
+        .bot {
+            background: #e9e9e9;
+        }
+        #inputArea {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Chatbot UNIDEG – Azure</h2>
+
+<div id="chatbox"></div>
+
+<div id="inputArea">
+    <input type="text" id="userInput" placeholder="Escribe tu pregunta...">
+    <button onclick="sendMessage()">Enviar</button>
+</div>
+
+<script>
+    async function sendMessage() {
+        const question = document.getElementById("userInput").value;
+        if (!question) return;
+
+        addMessage(question, "user");
+        document.getElementById("userInput").value = "";
+
+        const endpoint = "https://botsabes.cognitiveservices.azure.com/language/:query-knowledgebases?projectName=BotUNIDEG&api-version=2021-10-01&deploymentName=production";
+        const key = "3hKsWpgvXSqAzuhL5I0ZLRLdK9muZRN41yPGc3TJjO1BTqvE9ZWnJQQJ99BKAC1i4TkXJ3w3AAAaACOGPqku";
+
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Ocp-Apim-Subscription-Key": key,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "question": question
+            })
+        });
+
+        const data = await response.json();
+        let answer = data.answers?.[0]?.answer || "Lo siento, no encontré una respuesta.";
+        addMessage(answer, "bot");
+    }
+
+    function addMessage(text, sender) {
+        const chatbox = document.getElementById("chatbox");
+        const msg = document.createElement("div");
+        msg.className = "msg " + sender;
+        msg.textContent = text;
+        chatbox.appendChild(msg);
+        chatbox.scrollTop = chatbox.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
